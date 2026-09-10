@@ -1,6 +1,6 @@
 ---
 title: "Lionfish Data"
-subtitle: "An Analysis of Environmental Data"
+subtitle: "An Analysis of Environmental Data for Lionfish"
 author: "Rileigh Gonzalez"
 format:
   revealjs:
