@@ -12,6 +12,9 @@ dive_data <- read_rds("cleaned_garmin_dives.rds")
 # 3. Inspect data
 glimpse(dive_data)
 
+# Check the full date range
+range(dive_data$date, na.rm = TRUE)
+
 # Create figures folder
 dir.create("figures", showWarnings = FALSE)
 
@@ -28,12 +31,14 @@ depth_plot <- ggplot(
   )
 ) +
   geom_col(
-    width = 2
+    width = 5
   ) +
   scale_y_reverse() +
   scale_x_date(
-    date_breaks = "1 month",
-    date_labels = "%b %Y"
+    limits = range(dive_data$date, na.rm = TRUE),
+    date_breaks = "3 months",
+    date_labels = "%b %Y",
+    expand = expansion(mult = c(0.01, 0.01))
   ) +
   labs(
     title = "Maximum Dive Depth Over Time",
@@ -60,14 +65,12 @@ depth_plot <- ggplot(
     )
   )
 
-# Display plot
 depth_plot
 
-# Save plot
 ggsave(
   "figures/dive_depth_over_time.png",
   depth_plot,
-  width = 10,
+  width = 12,
   height = 6,
   dpi = 300
 )
@@ -108,14 +111,12 @@ depth_distribution <- ggplot(
     )
   )
 
-# Display plot
 depth_distribution
 
-# Save plot
 ggsave(
   "figures/dive_depth_distribution.png",
   depth_distribution,
-  width = 8,
+  width = 9,
   height = 6,
   dpi = 300
 )
@@ -139,11 +140,13 @@ monthly_plot <- ggplot(
   )
 ) +
   geom_col(
-    width = 25
+    width = 20
   ) +
   scale_x_date(
-    date_breaks = "1 month",
-    date_labels = "%b %Y"
+    limits = range(dive_data$date, na.rm = TRUE),
+    date_breaks = "3 months",
+    date_labels = "%b %Y",
+    expand = expansion(mult = c(0.01, 0.01))
   ) +
   labs(
     title = "Number of Dives by Month",
@@ -170,44 +173,51 @@ monthly_plot <- ggplot(
     )
   )
 
-# Display plot
 monthly_plot
 
-# Save plot
 ggsave(
   "figures/dives_by_month.png",
   monthly_plot,
-  width = 10,
+  width = 12,
   height = 6,
   dpi = 300
 )
 
 
 # ============================================================
-# Visualization 4: Average Dive Depth by Activity Type
+# Visualization 4: Number of Dives by Depth Range
 # ============================================================
 
-activity_summary <- dive_data %>%
-  group_by(activity_type) %>%
-  summarise(
-    average_depth = mean(
+depth_ranges <- dive_data %>%
+  mutate(
+    depth_range = cut(
       max_depth_num,
-      na.rm = TRUE
+      breaks = c(0, 10, 20, 30, 40, 50, Inf),
+      labels = c(
+        "0–10 m",
+        "10–20 m",
+        "20–30 m",
+        "30–40 m",
+        "40–50 m",
+        "50+ m"
+      ),
+      include.lowest = TRUE
     )
-  )
+  ) %>%
+  count(depth_range)
 
-depth_activity <- ggplot(
-  activity_summary,
+depth_range_plot <- ggplot(
+  depth_ranges,
   aes(
-    x = activity_type,
-    y = average_depth
+    x = depth_range,
+    y = n
   )
 ) +
   geom_col() +
   labs(
-    title = "Average Dive Depth by Activity Type",
-    x = "Activity Type",
-    y = "Average Maximum Depth (m)",
+    title = "Number of Dives by Depth Range",
+    x = "Maximum Depth Range",
+    y = "Number of Dives",
     caption = "Source: Garmin dive activity data"
   ) +
   theme_classic(base_size = 14) +
@@ -219,23 +229,17 @@ depth_activity <- ggplot(
     axis.title = element_text(
       face = "bold"
     ),
-    axis.text.x = element_text(
-      angle = 30,
-      hjust = 1
-    ),
     plot.caption = element_text(
       hjust = 0,
       size = 9
     )
   )
 
-# Display plot
-depth_activity
+depth_range_plot
 
-# Save plot
 ggsave(
-  "figures/average_depth_by_activity.png",
-  depth_activity,
+  "figures/dives_by_depth_range.png",
+  depth_range_plot,
   width = 9,
   height = 6,
   dpi = 300

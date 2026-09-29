@@ -8,7 +8,7 @@ library(janitor)
 
 # 2. Import the Garmin CSV
 raw_dive_data <- read_csv(
-  "/Users/rilei/Documents/EVR628 Class Fall 2026/my_portfolio/scripts/01_processing/Activities.csv"
+  "/Users/rilei/Documents/EVR628 Class Fall 2026/my_portfolio/scripts/01_processing/Activities (2).csv"
 )
 # 3. Clean column names
 raw_dive_data <- raw_dive_data %>%
