@@ -6,7 +6,7 @@ Rileigh Gonzalez
 
 ## Description
 
-Looking at lionfish data
+Looking at garmin dive watch data
 
 ## Project Structure
 
